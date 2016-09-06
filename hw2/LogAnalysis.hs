@@ -27,16 +27,17 @@ getError s = case (readMaybe (getToken s)) of
    Nothing -> TypeDoneError
 
 parseTimeStamp :: TypeDone -> TimeStampDone
-parseTimeStamp (TypeDone mt s) = TimeStampDone mt 10 s
-parseTimeStamp TypeDoneError = TimeStampDoneError 
+parseTimeStamp (TypeDone mt s) = case (readMaybe (getToken s)) of
+   (Just x) -> TimeStampDone mt x (getRemaining s)
+   Nothing -> TimeStampDoneError
+parseTimeStamp TypeDoneError = TimeStampDoneError
+ 
+getAllMessage :: TimeStampDone -> LogMessage
+getAllMessage (TimeStampDone mt ts s) = LogMessage mt ts s
+getAllMessage TimeStampDoneError = Unknown "test" 
 
--- parseInfo :: TimeStampDone -> InfoDone
-
--- getAllMessage :: InfoDone -> LogMessage
-
-
--- parseMessage :: String -> LogMessage
--- parseMessage s = (getAllMessage . parseInfo . parseTimeStamp . parseType) s
+parseMessage :: String -> LogMessage
+parseMessage s = (getAllMessage . parseTimeStamp . parseType) s
 
 
 -- parseMessage "E 2 562 help help"
