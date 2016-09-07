@@ -5,6 +5,9 @@ import Text.Read
 
 
 -- Excercise 1
+
+-- Types --
+
 type Remaining = String
 type FullLine = String
 
@@ -15,13 +18,17 @@ data TypeDone = TypeDone MessageType Remaining FullLine
 data TimeStampDone = TimeStampDone MessageType TimeStamp Remaining FullLine
                    | TimeStampDoneError FullLine
 
+-- Functions --
 
 parseType :: String -> TypeDone
 parseType s
-   | startswith "I" s = TypeDone Info (getRemaining s) s 
-   | startswith "W" s = TypeDone Warning (getRemaining s) s 
-   | startswith "E" s = getError (getRemaining s) s
+   | startswith "I " s = TypeDone Info (getRemaining s) s 
+   | startswith "W " s = TypeDone Warning (getRemaining s) s 
+   | startswith "E " s = getError (getRemaining s) s
    | otherwise = TypeDoneError s
+
+parse :: String -> [LogMessage]
+parse s = map parseMessage $ lines s
  
 getError :: String -> String -> TypeDone
 getError s fullLine = case (readMaybe (getToken s)) of
@@ -41,22 +48,7 @@ getAllMessage (TimeStampDoneError fullLine) = Unknown fullLine
 parseMessage :: String -> LogMessage
 parseMessage s = (getAllMessage . parseTimeStamp . parseType) s
 
-
--- parseMessage "E 2 562 help help"
---  == LogMessage (Error 2) 562 "help help"
-
--- parseMessage _ = LogMessage (Error 1) 1 "test"
--- parseMessage = s
---    | startswith "I" s = getMessage (getTimestamp (Info, s)) 
-
-
-
-
-parse :: String -> [LogMessage]
-parse s = map parseMessage $ lines s
-
-
-getToken = takeWhile (\x -> x /= ' ')
+getToken = head . words
 
 startswith :: String -> String -> Bool
 startswith [] _ = True
