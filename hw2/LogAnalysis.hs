@@ -52,7 +52,8 @@ parseMessage s = (getAllMessage . parseTimeStamp . parseType) s
 
 
 
-
+parse :: String -> [LogMessage]
+parse s = map parseMessage $ lines s
 
 
 getToken = takeWhile (\x -> x /= ' ')
